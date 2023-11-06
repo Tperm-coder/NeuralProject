@@ -1,5 +1,10 @@
 import random
 class Adaline :
+    learningRate = 0.01
+    epochs = 50
+    mseThresh = 0.001
+    hasBias = True
+    data = []
 
     def __init__(self, learningRate, epochs, mseThresh, hasBias, data):
         self.learningRate = learningRate
@@ -28,22 +33,25 @@ class Adaline :
 
         mse = 0
         n = len(self.data)
-        for _ in range(self.epochs):
+        for _ in range(int(self.epochs)):
             res = 0
             mse = 0
             for i in range(n):
+                print(int(self.hasBias),self.data[i],weightsVector)
                 if(self.hasBias):
-                    res = self.dotProducts(self.data[i][:-1], weightsVector[1:])
+                    res = self.dotProduct(self.data[i][:-1], weightsVector[1:])
                 else:
-                    res = self.dotProducts(self.data[i][:-1], weightsVector)
+                    res = self.dotProduct(self.data[i][:-1], weightsVector)
+
+                print("====>",res,"\n")
             
                 if(self.hasBias):
                     weightsVector[0] += self.learningRate * res
 
-                for j in range(int(self.hasBias, len(weightsVector))):
+                for j in range(int(self.hasBias), len(weightsVector)):
                     weightsVector[j] += self.learningRate * res * self.data[i][j - int(self.hasBias)]
             
-                mse += res**2
+                mse += res**2 * 0.5
             
             mse /= n
             if(mse <= self.mseThresh):
