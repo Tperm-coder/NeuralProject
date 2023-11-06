@@ -2,6 +2,8 @@ from PyQt5.QtWidgets import *
 from PyQt5 import uic
 from adaline import Adaline
 import pandas as pd
+from sklearn.preprocessing import MinMaxScaler
+
 
 DATASET_PATH = "../Dataset/data.csv"
 
@@ -89,7 +91,6 @@ class MyGUI(QMainWindow):
                 choosenFeauters.append(f)
 
         return choosenFeauters
-
     #---------------------------------------
 
 
@@ -112,10 +113,15 @@ class MyGUI(QMainWindow):
         data["Class"] = data["Class"].map(class_mapping)
 
         _features = features.copy()
+        # Create a Min-Max Scaler
+        scaler = MinMaxScaler()
+        data[_features] = scaler.fit_transform(data[_features])
+
         _features.append("Class")
         selected_columns = data[_features]
 
         data_as_list_of_lists = selected_columns.values.tolist()
+
 
         data = []
         for row in data_as_list_of_lists :
@@ -162,8 +168,15 @@ class MyGUI(QMainWindow):
         
     
         data = self.getTrainingDataAfterFormating(choice,features)
-        self.Adaline = Adaline(learningRate,epocs,mseThreshold,isAddBias,data)
-        print(self.Adaline.fit(len(features))) # -1 for the class column
+
+        
+        weightsVector = []
+        if isAdeline :
+            self.Adaline = Adaline(learningRate,epocs,mseThreshold,isAddBias,data)
+            weightsVector = self.Adaline.fit(len(features))
+        else :
+            pass
+        
 
     
         return

@@ -23,6 +23,12 @@ class Adaline :
         
         return res
 
+    def signum(self,x) :
+        if x > 0 :
+            return 1
+        if x < 0 :
+            return -1
+        return 0
 
     def fit(self, features = 2):
 
@@ -37,13 +43,10 @@ class Adaline :
             res = 0
             mse = 0
             for i in range(n):
-                print(int(self.hasBias),self.data[i],weightsVector)
                 if(self.hasBias):
                     res = self.dotProduct(self.data[i][:-1], weightsVector[1:])
                 else:
                     res = self.dotProduct(self.data[i][:-1], weightsVector)
-
-                print("====>",res,"\n")
             
                 if(self.hasBias):
                     weightsVector[0] += self.learningRate * res
@@ -54,8 +57,10 @@ class Adaline :
                 mse += res**2 * 0.5
             
             mse /= n
+
             if(mse <= self.mseThresh):
                 break
+
         return weightsVector
 
 
