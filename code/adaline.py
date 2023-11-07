@@ -1,7 +1,7 @@
 import random
 class Adaline :
-    learningRate = 0.01
-    epochs = 50
+    learningRate = 0.001
+    epochs = 100
     mseThresh = 0.001
     hasBias = True
     data = []
@@ -23,12 +23,8 @@ class Adaline :
         
         return res
 
-    def signum(self,x) :
-        if x > 0 :
-            return 1
-        if x < 0 :
-            return -1
-        return 0
+
+
 
     def fit(self, features = 2):
 
@@ -39,28 +35,45 @@ class Adaline :
 
         mse = 0
         n = len(self.data)
-        for _ in range(int(self.epochs)):
-            res = 0
-            mse = 0
-            for i in range(n):
-                if(self.hasBias):
-                    res = self.dotProduct(self.data[i][:-1], weightsVector[1:])
-                else:
-                    res = self.dotProduct(self.data[i][:-1], weightsVector)
-            
-                if(self.hasBias):
-                    weightsVector[0] += self.learningRate * res
+        try :
+            for _ in range(int(self.epochs)):
+                res = 0
+                mse = 0
+                for i in range(n):
+                    if(self.hasBias):
+                        res = self.dotProduct(self.data[i][:-1], weightsVector[1:])
+                    else:
+                        res = self.dotProduct(self.data[i][:-1], weightsVector)
 
-                for j in range(int(self.hasBias), len(weightsVector)):
-                    weightsVector[j] += self.learningRate * res * self.data[i][j - int(self.hasBias)]
-            
-                mse += res**2 * 0.5
-            
-            mse /= n
+                    if(self.hasBias):
+                        weightsVector[0] += self.learningRate * res
 
-            if(mse <= self.mseThresh):
-                break
+                    for j in range(int(self.hasBias), len(weightsVector)):
+                        weightsVector[j] += self.learningRate * res * self.data[i][j - int(self.hasBias)]
 
+
+                res = 0
+                for i in range(n):
+                    if(self.hasBias):
+                        res = self.dotProduct(self.data[i][:-1], weightsVector[1:])
+                    else:
+                        res = self.dotProduct(self.data[i][:-1], weightsVector)
+
+
+                
+                
+                mse += (res**2) * 0.5
+                mse /= n
+                
+
+                if(mse <= self.mseThresh):
+                    print("MSE reached")
+                    break
+        except :
+            print("Overshoot")
+            return False
+
+        print(weightsVector)
         return weightsVector
 
 
