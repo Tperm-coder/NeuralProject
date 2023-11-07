@@ -116,6 +116,11 @@ class MyGUI(QMainWindow):
         class_mapping = {"BOMBAY": 0, "CALI": 1, "SIRA": 2}
         data["Class"] = data["Class"].map(class_mapping)
 
+
+        
+
+
+
         _features = features.copy()
         if normalize :
             scaler = MinMaxScaler()
@@ -129,15 +134,21 @@ class MyGUI(QMainWindow):
 
         data = []
         for row in data_as_list_of_lists :
+
+            tmpRow = row.copy()
             if (choice == 0.0) :
                 if (row[-1] == 0.0 or row[-1] == 2.0) :
-                    data.append(row)
+                    if(row[-1] == 2.0):
+                        tmpRow[-1] = 1.0
+                    data.append(tmpRow)
             elif (choice == 1.0) :
                 if (row[-1] == 1.0 or row[-1] == 2.0) :
-                    data.append(row)
+                    if(row[-1] == 2.0):
+                        tmpRow[-1] = 0.0
+                    data.append(tmpRow)
             elif (choice == 2.0) :
                 if (row[-1] == 1.0 or row[-1] == 0.0) :
-                    data.append(row)
+                    data.append(tmpRow)
         
         return data
 
@@ -162,7 +173,7 @@ class MyGUI(QMainWindow):
         
         return c1_train,c1_test,c2_test,c2_test
 
-    def drawGraph(self,data,weights,b) :
+    def drawGraph(self,data,weights,b, features) :
         x = []
         y = []
         colors = []
@@ -196,14 +207,19 @@ class MyGUI(QMainWindow):
 
         plt.plot(x_boundary, y_boundary, color='red', label='Decision Boundary')
 
-        plt.xlabel('Feature 1')
-        plt.ylabel('Feature 2')
+        plt.xlabel(features[0])
+        plt.ylabel(features[1])
         plt.legend()
         plt.grid(True)
         plt.show()
 
     def confusion_matrix(self,actual, predicted):
-
+        
+        print('----------------------')
+        print(actual)
+        print('----------------------')
+        print(predicted)
+        
         f1 = list(set(actual))[0] # positive
         f2 = list(set(actual))[1] # negative
 
@@ -319,5 +335,6 @@ class MyGUI(QMainWindow):
         print(conf_mat)
         self._showPopUp("Results" , "Accuracy\n" + str(accuracy) + "%\n\n" + conf_mat)
 
-        self.drawGraph(data,weights,bias)
+        
+        self.drawGraph(data,weights,bias, features)
         return
