@@ -8,24 +8,47 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score,confusion_matrix
 from neural_network import NeuralNetwork
 
-
-
-
 DATASET_PATH = "../Dataset/data.csv"
+
+
+class CustomMinMaxScaler:
+    def __init__(self):
+        self.areaScaler = MinMaxScaler()
+        self.perimeterScaler = MinMaxScaler()
+        self.roundnessScaler = MinMaxScaler()
+        self.majAlScaler = MinMaxScaler()
+        self.minAlScaler = MinMaxScaler()
+
+    def fit_transform(self, X):
+        X["Area"] = self.areaScaler.fit_transform(X[["Area"]])
+        X["Perimeter"] = self.perimeterScaler.fit_transform(X[["Perimeter"]])
+        X["MajorAxisLength"] = self.majAlScaler.fit_transform(X[["MajorAxisLength"]])
+        X["MinorAxisLength"] = self.minAlScaler.fit_transform(X[["MinorAxisLength"]])
+        X["roundnes"] = self.roundnessScaler.fit_transform(X[["roundnes"]])
+        return X
+
 
 class MyGUI(QMainWindow):
     isModelTrained = False
     neuralClass = True
+    areaScaler = True
+    perimeterScaler = True
+    roundnessScaler = True
+    majAlScaler = True
+    minAlScaler = True
+    customMinMaxScaler = True
 
 
     def __init__(self,UI_file_path):
         super(MyGUI,self).__init__()
         uic.loadUi(UI_file_path,self)
         self.neuralClass = True
+        
 
         self.show()
 
         self.trainButton.clicked.connect(self.onStartTrainingClick)
+        self.predictBtn.clicked.connect(self.onPredict)
 
     def confusion_matrix(self,actual, predicted):
         
@@ -96,11 +119,11 @@ class MyGUI(QMainWindow):
         # Assuming the first column is the 'Class' column
         y = df['Class']
         X = df.iloc[:, :5]
+        # X = pd.DataFrame(X)
 
-        scaler = MinMaxScaler()
-        X = scaler.fit_transform(X)
+        self.customMinMaxScaler = CustomMinMaxScaler()
+        X = self.customMinMaxScaler.fit_transform(X.copy())
         X = pd.DataFrame(X)
-
 
         # Split the data into training and testing sets for each class
         test_indices = []
@@ -145,21 +168,25 @@ class MyGUI(QMainWindow):
         # print(predictions)
 
         cnt = 0
+        _pred = []
+        _actual = []
         for predI in range(len(predictions)):
             testClass = -1
             predictedClass = -1
             for i in range(len(predictions[predI])):
                 if(predictions[predI][i] > 0.0):
                     predictedClass = i
+            _pred.append(predictedClass)
 
             for i in range(len(y_test[predI])):
                 if(y_test[predI][i] > 0.0):
                     testClass = i
+            _actual.append(testClass)
 
             if(testClass == predictedClass):
                 cnt += 1
 
-        confusion_mat = confusion_matrix(np.argmax(y_test, axis=0), np.argmax(predictions, axis=0))
+        confusion_mat = confusion_matrix(_pred ,_actual)
         print("Confusion Matrix:")
         print(confusion_mat)
 
@@ -171,4 +198,13 @@ class MyGUI(QMainWindow):
 
 
     def onPredict(self) :
-        pass
+        if (not self.isModelTrained) :
+            self.showPopUp("Warning", "You need to train the model first")
+
+        area = float(self.learningInp.text())
+        perimeter = float(self.learningInp.text())
+        major = float(self.learningInp.text())
+        minor = float(self.learningInp.text())
+        roundness = float(self.learningInp.text())
+        
+

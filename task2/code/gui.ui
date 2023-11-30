@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>MainWindow</class>
- <widget class="QMainWindow" name="MainWindow">
+ <class>predict</class>
+ <widget class="QMainWindow" name="predict">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -242,7 +242,7 @@
      <string>Train model</string>
     </property>
    </widget>
-   <widget class="QDoubleSpinBox" name="doubleSpinBox_2">
+   <widget class="QDoubleSpinBox" name="area">
     <property name="geometry">
      <rect>
       <x>50</x>
@@ -255,7 +255,7 @@
      <double>9999999999.000000000000000</double>
     </property>
    </widget>
-   <widget class="QLabel" name="label_6">
+   <widget class="QLabel" name="awdfasd">
     <property name="geometry">
      <rect>
       <x>50</x>
@@ -272,10 +272,10 @@
      </font>
     </property>
     <property name="text">
-     <string>Learning rate</string>
+     <string>area</string>
     </property>
    </widget>
-   <widget class="QDoubleSpinBox" name="doubleSpinBox_3">
+   <widget class="QDoubleSpinBox" name="perimeter">
     <property name="geometry">
      <rect>
       <x>190</x>
@@ -288,7 +288,7 @@
      <double>9999999999.000000000000000</double>
     </property>
    </widget>
-   <widget class="QLabel" name="label_7">
+   <widget class="QLabel" name="sdfsdf">
     <property name="geometry">
      <rect>
       <x>190</x>
@@ -308,7 +308,7 @@
      <string>Perimeter</string>
     </property>
    </widget>
-   <widget class="QDoubleSpinBox" name="doubleSpinBox_4">
+   <widget class="QDoubleSpinBox" name="majoral">
     <property name="geometry">
      <rect>
       <x>330</x>
@@ -321,7 +321,7 @@
      <double>9999999999.000000000000000</double>
     </property>
    </widget>
-   <widget class="QLabel" name="label_8">
+   <widget class="QLabel" name="sdfs">
     <property name="geometry">
      <rect>
       <x>330</x>
@@ -341,7 +341,7 @@
      <string>Major axis length</string>
     </property>
    </widget>
-   <widget class="QDoubleSpinBox" name="doubleSpinBox_5">
+   <widget class="QDoubleSpinBox" name="minoral">
     <property name="geometry">
      <rect>
       <x>470</x>
@@ -354,7 +354,7 @@
      <double>9999999999.000000000000000</double>
     </property>
    </widget>
-   <widget class="QLabel" name="label_9">
+   <widget class="QLabel" name="dsfsdf">
     <property name="geometry">
      <rect>
       <x>470</x>
@@ -374,7 +374,7 @@
      <string>Minor axis length</string>
     </property>
    </widget>
-   <widget class="QDoubleSpinBox" name="doubleSpinBox_6">
+   <widget class="QDoubleSpinBox" name="roundness">
     <property name="geometry">
      <rect>
       <x>610</x>
@@ -387,7 +387,7 @@
      <double>9999999999.000000000000000</double>
     </property>
    </widget>
-   <widget class="QLabel" name="label_10">
+   <widget class="QLabel" name="sdfdsfdsfsdf">
     <property name="geometry">
      <rect>
       <x>610</x>
@@ -427,7 +427,7 @@
      <string>Model Training</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="pushButton_2">
+   <widget class="QPushButton" name="predictBtn">
     <property name="geometry">
      <rect>
       <x>340</x>
