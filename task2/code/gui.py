@@ -95,126 +95,173 @@ class MyGUI(QMainWindow):
 
     def onStartTrainingClick(self) :
 
-        networkStructure = str(self.networkStructure.toPlainText()).split(',')
-        for i in range(len(networkStructure)) :
-            networkStructure[i] = int(networkStructure[i])
-        epochs = int(self.epochsInp.text())
-        learningRate = float(self.learningInp.text())
-        isBiasAdded = bool(self.isBiased.isChecked())
-        activationFunction = "sigmoid"
-        
-        if (bool(self.isHyper.isChecked())) :
-            activationFunction = "tanh"
+        try :
 
-        print(networkStructure,epochs,learningRate,isBiasAdded,activationFunction)
+            networkStructure = str(self.networkStructure.toPlainText()).split(',')
+            for i in range(len(networkStructure)) :
+                networkStructure[i] = int(networkStructure[i])
+            epochs = int(self.epochsInp.text())
+            learningRate = float(self.learningInp.text())
+            isBiasAdded = bool(self.isBiased.isChecked())
+            activationFunction = "sigmoid"
+            
+            if (bool(self.isHyper.isChecked())) :
+                activationFunction = "tanh"
 
-        # data preprocessing & splitting
-        data = pd.read_csv(DATASET_PATH)
-        df = pd.DataFrame(data)
+            print(networkStructure,epochs,learningRate,isBiasAdded,activationFunction)
 
-        MinorAxisLength = df['MinorAxisLength']
-        ave = MinorAxisLength.mean()
-        MinorAxisLength.fillna(ave, inplace=True)
-        df['MinorAxisLength'] = MinorAxisLength
-        # Assuming the first column is the 'Class' column
-        y = df['Class']
-        X = df.iloc[:, :5]
-        # X = pd.DataFrame(X)
+            # data preprocessing & splitting
+            data = pd.read_csv(DATASET_PATH)
+            df = pd.DataFrame(data)
 
-        self.customMinMaxScaler = CustomMinMaxScaler()
-        X = self.customMinMaxScaler.fit_transform(X.copy())
-        X = pd.DataFrame(X)
+            MinorAxisLength = df['MinorAxisLength']
+            ave = MinorAxisLength.mean()
+            MinorAxisLength.fillna(ave, inplace=True)
+            df['MinorAxisLength'] = MinorAxisLength
+            # Assuming the first column is the 'Class' column
+            y = df['Class']
+            X = df.iloc[:, :5]
+            # X = pd.DataFrame(X)
 
-        # Split the data into training and testing sets for each class
-        test_indices = []
-        train_indices = []
+            self.customMinMaxScaler = CustomMinMaxScaler()
+            X = self.customMinMaxScaler.fit_transform(X.copy())
+            print(X)
+            X = pd.DataFrame(X)
 
-        # Iterate through each class
-        for class_label in y.unique():
-            # Get indices for the current class
-            class_indices = df[y == class_label].index
+            # Split the data into training and testing sets for each class
+            test_indices = []
+            train_indices = []
 
-            # Split the indices into training (30 samples) and testing (20 samples)
-            train_class_indices, test_class_indices = train_test_split(class_indices, test_size=20, random_state=42)
+            # Iterate through each class
+            for class_label in y.unique():
+                # Get indices for the current class
+                class_indices = df[y == class_label].index
 
-            # Add the indices to the overall lists
-            train_indices.extend(train_class_indices[:30])  # Take the first 30 for training
-            test_indices.extend(test_class_indices)
+                # Split the indices into training (30 samples) and testing (20 samples)
+                train_class_indices, test_class_indices = train_test_split(class_indices, test_size=20, random_state=42)
 
-        # Shuffle the indices
-        train_indices = np.random.permutation(train_indices)
-        test_indices = np.random.permutation(test_indices)
+                # Add the indices to the overall lists
+                train_indices.extend(train_class_indices[:30])  # Take the first 30 for training
+                test_indices.extend(test_class_indices)
 
-        # Create training and testing sets
-        X_train = X.loc[train_indices].values
-        y_train = pd.get_dummies(y.loc[train_indices]).values
+            # Shuffle the indices
+            train_indices = np.random.permutation(train_indices)
+            test_indices = np.random.permutation(test_indices)
 
-        X_test = X.loc[test_indices].values
-        y_test = pd.get_dummies(y.loc[test_indices]).values
+            # Create training and testing sets
+            X_train = X.loc[train_indices].values
+            y_train = pd.get_dummies(y.loc[train_indices]).values
 
-
-        # Initialize and train the neural network
-        self.neuralClass = NeuralNetwork(5, networkStructure, 3, learningRate, epochs, False, activationFunction)
-        self.neuralClass.train(X_train, y_train)
-
-        # Make predictions on the test set
-        predictions = self.neuralClass.predict(X_test)
-
-        # Evaluate the performance
-        # print("np.argmax(y_test, axis=0) :", np.argmax(y_test, axis=0), "np.argmax(predictions, axis=0) :",
-        #       np.argmax(predictions, axis=0), sep="\n")
-        # print(y_test)
-        # print('-------------------')
-        # print(predictions)
-
-        cnt = 0
-        _pred = []
-        _actual = []
-        for predI in range(len(predictions)):
-            testClass = -1
-            predictedClass = -1
-            for i in range(len(predictions[predI])):
-                if(predictions[predI][i] > 0.0):
-                    predictedClass = i
-            _pred.append(predictedClass)
-
-            for i in range(len(y_test[predI])):
-                if(y_test[predI][i] > 0.0):
-                    testClass = i
-            _actual.append(testClass)
-
-            if(testClass == predictedClass):
-                cnt += 1
-
-        confusion_mat = confusion_matrix(_pred ,_actual)
-        print("Confusion Matrix:")
-        print(confusion_mat)
-
-        acc = ("Overall Accuracy:\n" +  str(cnt/len(y_test)*100)+' %'+"\n\nConfusion Matrix :\n"+str(confusion_mat))
-        self.showPopUp("Training is done",acc)
+            X_test = X.loc[test_indices].values
+            y_test = pd.get_dummies(y.loc[test_indices]).values
 
 
-        isModelTrained = True
+            # Initialize and train the neural network
+            self.neuralClass = NeuralNetwork(5, networkStructure, 3, learningRate, epochs, False, activationFunction)
+            self.neuralClass.train(X_train, y_train)
 
+            # Make predictions on the test set
+            predictions = self.neuralClass.predict(X_test)
+
+            # Evaluate the performance
+            # print("np.argmax(y_test, axis=0) :", np.argmax(y_test, axis=0), "np.argmax(predictions, axis=0) :",
+            #       np.argmax(predictions, axis=0), sep="\n")
+            # print(y_test)
+            # print('-------------------')
+            # print(predictions)
+
+            cnt = 0
+            _pred = []
+            _actual = []
+            for predI in range(len(predictions)):
+                testClass = -1
+                predictedClass = -1
+                for i in range(len(predictions[predI])):
+                    if(predictions[predI][i] > 0.0):
+                        predictedClass = i
+                _pred.append(predictedClass)
+
+                for i in range(len(y_test[predI])):
+                    if(y_test[predI][i] > 0.0):
+                        testClass = i
+                _actual.append(testClass)
+
+                if(testClass == predictedClass):
+                    cnt += 1
+
+            confusion_mat = confusion_matrix(_pred ,_actual)
+            print("Confusion Matrix:")
+            print(confusion_mat)
+
+            predictions = self.neuralClass.predict(X_train)
+
+            __cnt = 0
+            __pred = []
+            __actual = []
+            for predI in range(len(predictions)):
+                testClass = -1
+                predictedClass = -1
+                for i in range(len(predictions[predI])):
+                    if(predictions[predI][i] > 0.0):
+                        predictedClass = i
+                __pred.append(predictedClass)
+
+                for i in range(len(y_train[predI])):
+                    if(y_train[predI][i] > 0.0):
+                        testClass = i
+                __actual.append(testClass)
+
+                if(testClass == predictedClass):
+                    __cnt += 1
+
+            acc = ("Test Accuracy:\n" +  str(cnt/len(y_test)*100)+' %\n\n'+ "Train Accuracy:\n" +  str(__cnt/len(y_train)*100)+' %'+      "\n\nConfusion Matrix :\n"+str(confusion_mat))
+            self.showPopUp("Training is done",acc)
+
+
+            self.isModelTrained = True
+        except :
+            self.showPopUp("Error" , "A runtime error occurred")
 
     def onPredict(self) :
         if (not self.isModelTrained) :
             self.showPopUp("Warning", "You need to train the model first")
+            return
 
-        area = float(self.learningInp.text())
-        perimeter = float(self.learningInp.text())
-        major = float(self.learningInp.text())
-        minor = float(self.learningInp.text())
-        roundness = float(self.learningInp.text())
+        area = float(self.area.text())
+        perimeter = float(self.perimeter.text())
+        major = float(self.majoral.text())
+        minor = float(self.minoral.text())
+        roundness = float(self.roundness.text())
 
-        X = [area,perimeter,major,minor,roundness]        
+        X = {
+            'Area': [area],
+            'Perimeter': [perimeter],
+            'MajorAxisLength': [major],
+            'MinorAxisLength': [minor],
+            'roundnes': [roundness],
+        }
+        X = pd.DataFrame(X)
+
         X = self.customMinMaxScaler.fit_transform(X.copy())
         X = pd.DataFrame(X)
 
-        self.neuralClass.predict(X)
-        print("Predicted" , X)
+        preds = self.neuralClass.predict(X.values)
+        print("Predicted" ,preds)
 
+        predictedClass = -1
+        for i in range(len(preds[0])) :
+            if (preds[0][i] == 1) :
+                predictedClass = i
 
+        _class = 0
+        if (predictedClass == 0) :
+            _class = "BOMBAY"
+        if (predictedClass == 1) :
+            _class = "CALI"
+        if (predictedClass == 2) :
+            _class = "SIRA"
+        
+        self.showPopUp("Done", "The predicted class is:\n" + _class)
 
 
         
