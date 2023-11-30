@@ -206,5 +206,16 @@ class MyGUI(QMainWindow):
         major = float(self.learningInp.text())
         minor = float(self.learningInp.text())
         roundness = float(self.learningInp.text())
+
+        X = [area,perimeter,major,minor,roundness]        
+        X = self.customMinMaxScaler.fit_transform(X.copy())
+        X = pd.DataFrame(X)
+
+        self.neuralClass.predict(X)
+        print("Predicted" , X)
+
+
+
+
         
 
