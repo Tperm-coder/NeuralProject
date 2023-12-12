@@ -219,7 +219,8 @@ class MyGUI(QMainWindow):
 
 
             self.isModelTrained = True
-        except :
+        except Exception as e:
+            print(e)
             self.showPopUp("Error" , "A runtime error occurred")
 
     def onPredict(self) :

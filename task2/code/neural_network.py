@@ -37,17 +37,15 @@ class NeuralNetwork:
         else:
             return [None] * len(self.weights)
 
-    def tanh(x):
-        # tanh(x) = (e^(2x) - 1) / (e^(2x) + 1)
-        exp_positive = math.exp(2 * x)
-        exp_negative = 1 / exp_positive
-        return (exp_positive - 1) / (exp_positive + 1)
+    def customTanh(self,x):
+        return (1-np.exp(-x)) / (1+np.exp(-x))
+    
 
     def activate(self, z):
         if self.activation_function == "sigmoid":
             return 1 / (1 + np.exp(-z))
         elif self.activation_function == "tanh":
-            return tanh(z)
+            return self.customTanh(z)
 
     def activate_derivative(self, a):
         if self.activation_function == "sigmoid":
@@ -64,6 +62,7 @@ class NeuralNetwork:
             # the dot_product is a vector resulted from multiplying a matrix by a vector
             if self.use_bias:
                 dot_product += self.biases[i]
+                
             dot_products.append(dot_product)
             activation = self.activate(dot_product)
             activations.append(activation)
