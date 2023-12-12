@@ -13,7 +13,6 @@ def perceptron(eta, max_epochs, data, add_bias=True):
     """
     
 
-    np.random.seed(0)
     w = np.random.rand(len(data[0])-1) # -1 to not inclue the last element which is the actual value
 
 
@@ -31,12 +30,20 @@ def perceptron(eta, max_epochs, data, add_bias=True):
 
             xi = np.array(xi)
 
-            # yi = np.sign(np.dot(w, xi) + b) 
+            # yi = (np.dot(w, xi) + b)
+
+
+            yi = np.sign(np.dot(w, xi) + b) 
             yi = np.where(np.dot(w, xi) + b >= 0, 1, 0)
             if yi != ti:
                 loss = ti - yi
                 w += eta * loss * xi
                 if b != 0:
                     b += eta * loss
+
+            # loss = ti - yi
+            # w += eta * loss * xi
+            # if b != 0:
+            #     b += eta * loss
 
     return w, b

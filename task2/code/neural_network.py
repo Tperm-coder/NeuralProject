@@ -37,11 +37,17 @@ class NeuralNetwork:
         else:
             return [None] * len(self.weights)
 
+    def tanh(x):
+        # tanh(x) = (e^(2x) - 1) / (e^(2x) + 1)
+        exp_positive = math.exp(2 * x)
+        exp_negative = 1 / exp_positive
+        return (exp_positive - 1) / (exp_positive + 1)
+
     def activate(self, z):
         if self.activation_function == "sigmoid":
             return 1 / (1 + np.exp(-z))
         elif self.activation_function == "tanh":
-            return np.tanh(z)
+            return tanh(z)
 
     def activate_derivative(self, a):
         if self.activation_function == "sigmoid":

@@ -13,6 +13,25 @@ from sklearn.metrics import accuracy_score
 
 DATASET_PATH = "../Dataset/data.csv"
 
+class CustomMinMaxScaler:
+    def __init__(self):
+        self.areaScaler = MinMaxScaler()
+        self.perimeterScaler = MinMaxScaler()
+        self.roundnessScaler = MinMaxScaler()
+        self.majAlScaler = MinMaxScaler()
+        self.minAlScaler = MinMaxScaler()
+        # self.class_ = MinMaxScaler()
+
+    def fit_transform(self, X):
+        X["Area"] = self.areaScaler.fit_transform(X[["Area"]])
+        X["Perimeter"] = self.perimeterScaler.fit_transform(X[["Perimeter"]])
+        X["MajorAxisLength"] = self.majAlScaler.fit_transform(X[["MajorAxisLength"]])
+        X["MinorAxisLength"] = self.minAlScaler.fit_transform(X[["MinorAxisLength"]])
+        X["roundnes"] = self.roundnessScaler.fit_transform(X[["roundnes"]])    
+        # X["Class"] = self.class_.fit_transform(X[["Class"]])    
+        return X
+        
+
 class MyGUI(QMainWindow):
 
     # global store acting as a single source of truth to share state across the app
@@ -29,7 +48,7 @@ class MyGUI(QMainWindow):
             "get" : {
                 "learningRate" : lambda : float(self.learningRateSpinBox.text()),
                 "epocs" : lambda : float(self.epocsSpinBox.text()),
-                "mseThreshold" : lambda : float(self.epocsSpinBox.text()),
+                "mseThreshold" : lambda : float(self.mseSpinBox.text()),
                 "isAddBias" : lambda : bool(self.addBiasCheckBox.isChecked()),
                 "isAdeline": lambda : bool(self.adalineRadioButton.isChecked()),
                 "isPercetron": lambda : bool(self.perceptronRadioButton.isChecked()),
@@ -64,8 +83,6 @@ class MyGUI(QMainWindow):
     def getLearningRate(self) :
         return self.store["get"]["learningRate"]()
     
-    def getMSEThreshold(self) :
-        return self.store["get"]["mseThreshold"]()
 
     def getMSEThreshold(self) :
         return self.store["get"]["mseThreshold"]()
@@ -112,19 +129,37 @@ class MyGUI(QMainWindow):
         data = pd.read_csv(DATASET_PATH)
 
         data = data.fillna(data.mean())
+        
+
+        
+        # choice = -1
+        # if (isBS) :
+        #     choice = 0
+        # elif (isCS) :
+        #     choice = 1
+        # else :
+        #     choice = 2
 
         class_mapping = {"BOMBAY": 0, "CALI": 1, "SIRA": 2}
+        # if (choice == 0.0) :
+        #     class_mapping = {"BOMBAY": 0, "CALI": -1, "SIRA": 1}
+        # elif (choice == 1.0) :
+        #     class_mapping = {"BOMBAY": -1, "CALI": 0, "SIRA": 1}
+
+
         data["Class"] = data["Class"].map(class_mapping)
 
 
-        
+        customMinMaxScaler = CustomMinMaxScaler()
+        data = customMinMaxScaler.fit_transform(data.copy())
 
 
 
         _features = features.copy()
-        if normalize :
-            scaler = MinMaxScaler()
-            data[_features] = scaler.fit_transform(data[_features])
+        # if normalize :
+        #     scaler = MinMaxScaler()
+        #     data[_features] = scaler.fit_transform(data[_features])
+        
 
         _features.append("Class")
         selected_columns = data[_features]
@@ -150,6 +185,7 @@ class MyGUI(QMainWindow):
                 if (row[-1] == 1.0 or row[-1] == 0.0) :
                     data.append(tmpRow)
         
+        print(data)
         return data
 
     def spilitData(self,data) :
@@ -267,6 +303,8 @@ class MyGUI(QMainWindow):
         isCS = self.getIsCSclasses()
         isBC = self.getIsBCclasses()
 
+        print("-=-=-=-=" , learningRate,epocs,mseThreshold)
+
         
         choice = -1
         if (isBS) :
@@ -304,7 +342,7 @@ class MyGUI(QMainWindow):
             self.Adaline = Adaline(learningRate,epocs,mseThreshold,isAddBias,data)
             weightsVector = self.Adaline.fit(len(features))
 
-            if weightsVector == False :
+            if weightsVector == [] :
                 self._showPopUp("Error" , "Gradient decent overshooted\n try smaller learning rate")
                 return
             if (isAddBias) :
